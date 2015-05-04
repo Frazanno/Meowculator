@@ -10,7 +10,7 @@
 	</head>
 
 	<body>
-		<div class="info" style='text-align: center; width: 100%; color:#404040'>Welcome to the Meowculator, the best math tool on the Internet!</div>
+		<div class="info" style='text-align: center; width: 100%; color:#404040'>Welcome to the Meowculator, the best math tool on the Internet! <br/> Warning: Automatic parentheses multiplication is NOT FUNCTIONAL!</div>
 		<div class="switch">
 			Music
 		</div>
