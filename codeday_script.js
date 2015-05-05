@@ -198,7 +198,7 @@ function calcEquation(equation, topLevel){
         }
     }
     else{
-        if(equation.charAt(firstIndex) == '-')
+        if(equation.charAt(firstIndex) == '-' && firstIndex > 0 && ['*', '/', '+', '-', 'L', 'r', '^'].indexOf(equation.charAt(firstIndex - 1)) == -1)
             v = calcEquation(equation.substring(0, firstIndex), false) -
             calcEquation(equation.substring(firstIndex + 1), false);
         else
