@@ -40,74 +40,112 @@ $(document).ready(function(){
     $(".e-num").click(function(){add("2.71828");});
     $(".exponential").click(function(){add("^");});
     $(".nth-root").click(function(){add("r");});
-    $(".log").click(function(){add("L");});
+    $(".ln").click(function(){add("L");});
+    
+    $(".x-var").click(function(){add("x");});
 
     $(".l-paren").click(function(){openParen();});
     $(".r-paren").click(function(){closeParen();});
 
     $(".submit").click(function(){submit();});
+    $(".deriv").click(function(){submitDeriv();});
 
     $("body").keypress(function(key){
         if(key.charCode >= 48 && key.charCode < 58)
             add(String.fromCharCode(key.charCode));
         switch(key.charCode){
-        case 69:
-        case 101:
-            add("2.71828");
-            break;
-        case 80:
-        case 112:
-            add("3.14159");
-            break;
-        case 76:
-        case 108:
-            add("L");
-            break;
-        case 82:
-        case 114:
-            add("r");
-            break;
-        case 42:
-            add("*");
-            break;
-        case 47:
-            add("/");
-            break;
-        case 43:
-            add("+");
-            break;
-        case 45:
-            add("-");
-            break;
-        case 94:
-            add("^");
-            break;
-        case 40:
-            openParen();
-            break;
-        case 41:
-            closeParen();
-            break;
-        case 46:
-            add(".");
-            break;
-        case 13:
-        case 61:
-            submit();
-            break;
-        case 67:
-        case 99:
-            clear();
-            break;
+            case 69:
+            case 101:
+                add("2.71828");
+                break;
+            case 80:
+            case 112:
+                add("3.14159");
+                break;
+            case 76:
+            case 108:
+                add("L");
+                break;
+            case 114:
+                add("r");
+                break;
+            case 42:
+                add("*");
+                break;
+            case 47:
+                add("/");
+                break;
+            case 43:
+                add("+");
+                break;
+            case 45:
+                add("-");
+                break;
+            case 94:
+                add("^");
+                break;
+            case 40:
+                openParen();
+                break;
+            case 41:
+                closeParen();
+                break;
+            case 46:
+                add(".");
+                break;
+            case 13:
+                submit();
+                clear();
+                break;
+            case 61:
+                submit();
+                break;
+            case 68:
+            case 100:
+                submitDeriv();
+                break;
+            case 88:
+            case 120:
+                add("x");
+                break;
+            case 115:
+                add("sin");
+                break;
+            case 83:
+                add("arcsin");
+                break;
+            case 99:
+                add("cos");
+                break;
+            case 67:
+                add("arccos");
+                break;
+            case 116:
+                add("tan");
+                break;
+            case 84:
+                add("arctan");
+                break;
+            case 82:
+                clear();
+                break;
         }
     });
 
     scroll();
 });
 
+function submitDeriv(){
+    noise();
+    var query = calcDeriv(calcTree($(".current").text())).replace(/c/g, "arcC").replace(/s/g, "arcS").replace(/t/g, "arcT").replace(/S/g, "sin").replace(/C/g, "cos").replace(/T/g, "tan").replace(/L/g, "ln").replace(/r/g, "root");
+    $(".output").append("<div class=\"question\">d/dx(" + $(".current").text() +
+            ")</div><div class=\"answer\">" + query + "</div>");
+    scroll();
+}
+
 function submit(){
     noise();
-    var query = calcEquation($(".current").text(), true);
+    var query = calcEquation(calcTree($(".current").text()), true);
     $(".output").append("<div class=\"question\">" + $(".current").text() +
             "</div><div class=\"answer\">" + query + "</div>");
     scroll();
@@ -126,13 +164,296 @@ function add(str){
     scroll();
 }
 
-function calcEquation(equation, topLevel){
+function getPrecedence(oper){
+    if(oper == "Error")
+        return "Error";
+    if(oper == '+')
+        return 1;
+    if(oper == '*' || oper == '/')
+        return 2;
+    return 3;
+}
+
+function getAssoc(oper){
+    if(oper == "Error")
+        return "Error";
+    if(oper == '^')
+        return "right";
+    return "left";
+}
+
+function TreeNode(self){
+    this.self = self;
+    this.node1 = null;
+    this.node2 = null;
+    this.containsX = function(){
+        if(this.self == "x")
+            return true;
+        if(this.node1 != null && this.node1.containsX())
+            return true;
+        if(this.node2 != null && this.node2.containsX())
+            return true;
+        return false;
+    }
+    /*this.getIndex = function(level, node){
+        return node+(1<<level)-1;
+    }
+    this.nodes = new Array();
+    this.setNode = function(value, level, node){
+        this.nodes[this.getIndex(level, node)] = value;
+    }
+    this.getNode = function(level, node){
+        return this.Nodes[this.getIndex(level, node)];
+    }*/
+}
+
+/*function Stack(){
+    this.items = new Array();
+    this.push = function(item){
+        this.items[this.items.length] = item;
+    }
+    this.pop = function(){
+        if(this.items.length == 0){
+            alert("Error!");
+            return "Error";
+        }
+        var item = this.items[this.items.length - 1];
+        this.items[this.items.length - 1];
+        return item;
+    }
+    this.get = function(){
+        return this.items[this.items.length - 1];
+    }
+}*/
+
+function calcString(tree){
+    if(tree.node2 == null){
+        if(tree.node1 == null)
+            return tree.self;
+        else
+            return tree.self + "(" + calcString(tree.node1) + ")";
+    }
+    else{
+        return "(" + calcString(tree.node1) + tree.self + calcString(tree.node2) + ")";
+    }
+}
+
+function calcDeriv(tree){
+    if(tree.containsX()){
+        var oneX = tree.node1 != null && tree.node1.containsX();
+        var twoX = tree.node2 != null && tree.node2.containsX();
+        switch(tree.self){
+            case "x":
+                return 1;
+            case "+":
+                if(oneX && !twoX)
+                    return "(" + calcDeriv(tree.node1) + "+" + calcEquation(tree.node2) + ")";
+                else if(twoX && !oneX)
+                    return "(" + calcEquation(tree.node1) + "+" + calcDeriv(tree.node2) + ")";
+                else
+                    return "(" + calcDeriv(tree.node1) + "+" + calcDeriv(tree.node2) + ")";
+            case "*":
+                if(oneX && !twoX)
+                    return "(" + calcDeriv(tree.node1) + "*" + calcEquation(tree.node2) + ")";
+                else if(twoX && !oneX)
+                    return "(" + calcEquation(tree.node1) + "*" + calcDeriv(tree.node2) + ")";
+                else
+                    return "(" + calcDeriv(tree.node1) + "*" + calcString(tree.node2) +
+                        "+" + calcString(tree.node1) + "*" + calcDeriv(tree.node2) + ")";
+            case "/":
+                if(oneX && !twoX)
+                    return "(" + calcDeriv(tree.node1) + "/" + calcEquation(tree.node2) + ")";
+                else if(twoX && !oneX){
+                    return "(-" + calcEquation(tree.node1) + "*" + calcDeriv(tree.node2) + "/" +
+                        calcString(tree.node2) + "^2)";
+                }
+                else{
+                    var two = calcString(tree.node2);
+                    return "((" + calcDeriv(tree.node1) + "*" + two +
+                        "+" + calcString(tree.node1) + "*" + calcDeriv(tree.node2) + ")/" +
+                        two + "^2)";
+                }
+            case "^":
+                if(oneX && !twoX){
+                    var num = calcEquation(tree.node2);
+                    return "(" + num + "*" + calcDeriv(tree.node1) + "*" + calcString(tree.node1) +
+                        "^" + (num - 1) + ")";
+                }
+                else if(twoX && !oneX){
+                    var num = calcEquation(tree.node1);
+                    return "(" + Math.log(num) / Math.log(Math.E) + "*" + calcDeriv(tree.node2) + "*" + num + "^" + calcString(tree.node1) + ")";
+                }
+                else{//TODO not done yet TODO TODO TODO
+                    var one = calcString(tree.node1);
+                    var two = calcString(tree.node2);
+                    return "(" + one + "^(" + two + "-1)*(" +  one + "*ln" + one + "*" +
+                        calcDeriv(tree.node2) + "+" + two + "*" + calcDeriv(tree.node1) + "))";
+                }
+            case "-":
+                return "(-" + calcDeriv(tree.node1) +")";
+            case "L":
+                return "(" + calcDeriv(tree.node1) + "/" + calcString(tree.node1) + ")";
+            case "r":
+                return "(" + calcDeriv(tree.node1) + "/r" + calcString(tree.node1) + "/2)";
+            case "S":
+                return "(" + calcDeriv(tree.node1) + "*C" + calcString(tree.node1) + ")";
+            case "C":
+                return "(-" + calcDeriv(tree.node1) + "*S" + calcString(tree.node1) + ")";
+            case "T":
+                return "(" + calcDeriv(tree.node1) + "/(C" + calcString(tree.node1) + ")^2)";
+            case "s":
+                return "(" + calcDeriv(tree.node1) + "/r(1-" + calcString(tree.node1) + "^2))";
+            case "c":
+                return "(-" + calcDeriv(tree.node1) + "/r(1-" + calcString(tree.node1) + "^2))";
+            case "t":
+                return "(" + calcDeriv(tree.node1) + "/(1+" + calcString(tree.node1) + "^2))";
+            default:
+                return "Error";
+        }
+    }
+    else return "0";
+}
+
+function calcTree(equation){
+    
     if(equation == "")
+        return new TreeNode(0);
+    if(equation == "9+10")
+        return new TreeNode(21);
+	equation = equation.replace(/-/g, "+-").replace(/\*\+-/g, "*-").replace(/\/\+-/g, "/-").replace(/\^\+-/g, "^-").replace(/sin\+-/g, "sin-").replace(/cos\+-/g, "cos-").replace(/tan\+-/g, "tan-").replace(/ln\+-/g, "ln-").replace(/root\+-/g, "root-").replace(/\+-\+-/g, "+").replace(/-\+-/g, "").replace(/\+\+/g, "+").replace(/arcsin/g, "s").replace(/arccos/g, "c").replace(/arctan/g, "t").replace(/sin/g, "S").replace(/cos/g, "C").replace(/tan/g, "T").replace(/ln/g, "L").replace(/root/g, "r");
+    
+    console.log(equation);
+    var ops = "*/+^-rLsScCtT)";
+    var ops1 = "*/+^";
+    var ops2 = "-rLsScCtT";
+    
+    var output = new Array();
+    var stack = new Array();
+    
+    var i = 0;
+    
+    while(i < equation.length){
+        var c = equation.charAt(i);
+        if(c == '('){
+            //console.log(c);
+            stack.push(c);
+            i++;
+        }
+        else if(c == ')'){
+            while(stack[stack.length - 1] != "("){
+                output.push(stack.pop());
+                if(stack.length == 0)
+                    return "Error";
+            }
+            stack.pop();
+            i++;
+        }
+        else if(ops1.indexOf(c) > -1){
+            while(stack.length > 0 && stack[stack.length - 1] != "(" &&
+                  ((getAssoc(stack[stack.length - 1]) == "left" && getPrecedence(stack[stack.length - 1]) > getPrecedence(c)) ||
+                  (getAssoc(stack[stack.length - 1]) == "right" && getPrecedence(stack[stack.length - 1]) >= getPrecedence(c)))){
+                output.push(stack.pop());
+            }
+            stack.push(c);
+            i++;
+        }
+        else if(ops2.indexOf(c) > -1){
+            stack.push(c);
+            i++;
+        }
+        else{
+            var number = "" + c;
+            while(ops.indexOf(equation.charAt(++i)) == -1)
+                number += equation.charAt(i);
+            //console.log(number);
+            output.push(number);
+        }
+    }
+    while(stack.length > 0){
+        if(stack[stack.length - 1] == '('){
+            return "Error";
+        }
+        output.push(stack.pop());
+    }
+    
+    //console.log(output);
+    var tree = parseTree(output, new TreeNode(output.pop()));
+    console.log(tree);
+    return tree;
+}
+
+function parseTree(stack, tree){
+    
+    //var ops = "*/-+^-rLsScCtT(";
+    var ops1 = "*/+^(";
+    var ops2 = "-rLsScCtT";
+    
+    if(ops1.indexOf(tree.self) > -1) {
+        tree.node2 = parseTree(stack, new TreeNode(stack.pop()));
+        tree.node1 = parseTree(stack, new TreeNode(stack.pop()));
+        return tree;
+    }
+    else if(ops2.indexOf(tree.self) > -1) {
+        tree.node1 = parseTree(stack, new TreeNode(stack.pop()));
+    }
+    return tree;
+    
+}
+
+function calcEquation(tree, topLevel){
+    
+    if(tree.node2 == null){
+        if(tree.node1 == null){
+            return parseFloat(tree.self);
+        }
+        else{
+            switch(tree.self){
+                case "-":
+                    return -calcEquation(tree.node1);
+                case "S":
+                    return Math.sin(calcEquation(tree.node1));
+                case "s":
+                    return Math.asin(calcEquation(tree.node1));
+                case "C":
+                    return Math.cos(calcEquation(tree.node1));
+                case "c":
+                    return Math.acos(calcEquation(tree.node1));
+                case "T":
+                    return Math.tan(calcEquation(tree.node1));
+                case "t":
+                    return Math.atan(calcEquation(tree.node1));
+                case "L":
+                    return Math.log(calcEquation(tree.node1)) / Math.log(Math.E);
+                case "r":
+                    return Math.pow(calcEquation(tree.node1), 0.5);
+                default:
+                    return 0;
+            }
+        }
+    }
+    else{
+        switch(tree.self){
+            case "+":
+                return calcEquation(tree.node1) + calcEquation(tree.node2);
+            case "*":
+                return calcEquation(tree.node1) * calcEquation(tree.node2);
+            case "/":
+                return calcEquation(tree.node1) / calcEquation(tree.node2);
+            case "^":
+                return Math.pow(calcEquation(tree.node1), calcEquation(tree.node2));
+                //TODO make sure we're done
+            default:
+                return 0;
+        }
+    }
+    
+    /*if(equation == "")
         return 0;
     if(topLevel && equation == "9+10")
         return 21;
-//	if(topLevel)
-//		equation = equation.replace("-", "+-");
+	if(topLevel){
+		equation = equation.replace("-", "+-").replace("*+-", "*-").replace("/+-", "/-").replace("L+-", "L-").replace("r+-", "r-").replace("^+-", "^-").replace("++", "+");
+    }
     while(equation.indexOf("(") >= 0){
         var parens = 0;
         var toParse = "";
@@ -157,7 +478,7 @@ function calcEquation(equation, topLevel){
         
         //equation = equation.replace(toParse, "" + calcEquation(toParse.substring(1, toParse.length - 1), false));
     }
-    var firstIndex = Math.max(equation.lastIndexOf('+'), equation.lastIndexOf("-"));
+    var firstIndex = equation.lastIndexOf('+');
     var secondIndex = -1;
     var thirdIndex = -1;
     var v = 0.0;
@@ -198,17 +519,17 @@ function calcEquation(equation, topLevel){
         }
     }
     else{
-        if(equation.charAt(firstIndex) == '-' && firstIndex > 0 && ['*', '/', '+', '-', 'L', 'r', '^'].indexOf(equation.charAt(firstIndex - 1)) == -1)
-            v = calcEquation(equation.substring(0, firstIndex), false) -
-            calcEquation(equation.substring(firstIndex + 1), false);
-        else
-            v = calcEquation(equation.substring(0, firstIndex), false) +
-            calcEquation(equation.substring(firstIndex + 1), false);
+//        if(equation.charAt(firstIndex) == '-' && firstIndex > 0 && ['*', '/', '+', '-', 'L', 'r', '^'].indexOf(equation.charAt(firstIndex - 1)) == -1)
+//            v = calcEquation(equation.substring(0, firstIndex), false) -
+//            calcEquation(equation.substring(firstIndex + 1), false);
+//        else
+        v = calcEquation(equation.substring(0, firstIndex), false) +
+        calcEquation(equation.substring(firstIndex + 1), false);
     }
-    return v;
+    return v;*/
 }
 
-function doParse(query){
+/*function doParse(query){
     if(query.replace(/[0-9]+\.[0-9]+|[0-9]+|\.[0-9]+/, "").length == 0){
         return parseFloat(query);
     }
@@ -282,7 +603,7 @@ function doParse(query){
         else
             return doParse(second);
     }
-}
+}*/
 
 function openParen(){
     $(".current").append("(");
