@@ -62,12 +62,12 @@
 					x<sup>y</sup>
 				</div>
 						
-				<div class = "nth-root">
-					<sup>n</sup>&radic;x
+				<div class = "sqrt">
+					&radic;x
 				</div>	
 
 				<div class = "log">
-					log<sub>b</sub>x
+					lnx
 				</div>
 						
 				<div class = "deriv">

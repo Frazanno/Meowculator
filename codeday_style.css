@@ -104,7 +104,6 @@ body {
 .x-var{
 	width: 60px;
 	height: 80px;
-	background-color: #BFBFBF;
 	border-right: 5px solid black;
 	border-top-left-radius: 14px;
 	border-bottom-left-radius: 14px;
@@ -131,7 +130,7 @@ body {
 	margin-left: 195px;
 	line-height: 65px;
 }
-.nth-root{
+.sqrt{
 	width: 100px;
 	height: 80px;
 	margin-left: 280px;
@@ -149,7 +148,6 @@ body {
 .deriv{
 	width: 119px;
 	height: 80px;
-	background-color: #BFBFBF;
 	margin-left: 511px; 
 	margin-top: -80px;
 	border-top-right-radius: 14px;
@@ -294,7 +292,8 @@ body {
 .one:hover, .two:hover, .three:hover, 
 .zero:hover, .point:hover, .clear:hover, 
 .l-paren:hover, .r-paren:hover, .submit:hover, 
-.pi-num:hover, .e-num:hover, .exponential:hover, .nth-root:hover, .log:hover{
+.pi-num:hover, .e-num:hover, .exponential:hover, 
+.nth-root:hover, .log:hover, .deriv:hover, .x-var:hover{
 background-color: #BFBFBF;
 transition: background 0.2s ease;
 }
