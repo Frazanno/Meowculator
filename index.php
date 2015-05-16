@@ -76,6 +76,22 @@
 
 			</div>
 
+			<div class = "trig">
+
+				<div class = "sin">
+					sin(x)
+				</div>
+
+				<div class = "cos">
+					cos(x)
+				</div>
+
+				<div class = "tan">
+					tan(x)
+				</div>
+
+			</div>
+
 			<div class = "keypad">
 
 				<div class = "numbers">

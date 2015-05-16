@@ -14,7 +14,7 @@ body {
 	font-family: "Lucida Console", Courier, monospace;
 }
 .calculator_outer {
-	height: 866px;
+	height: 990px;
 	width: 700px;
 	border-radius: 10px;
 	background-color: #5A79B3;
@@ -244,7 +244,6 @@ body {
 	line-height: 85px;
 }
 .multiply{
-
 	height: 88px;
 	width: 105px;
 	margin-left: 335px;
@@ -286,20 +285,6 @@ body {
 	line-height: 85px;
 	border-bottom-left-radius: 14px;
 	border-bottom-right-radius: 14px;
-}
-.switch:hover, .seven:hover, .eight:hover, .nine:hover, 
-.four:hover, .five:hover, .six:hover, 
-.one:hover, .two:hover, .three:hover, 
-.zero:hover, .point:hover, .clear:hover, 
-.l-paren:hover, .r-paren:hover, .submit:hover, 
-.pi-num:hover, .e-num:hover, .exponential:hover, 
-.nth-root:hover, .log:hover, .deriv:hover, .x-var:hover{
-background-color: #BFBFBF;
-transition: background 0.2s ease;
-}
-.multiply:hover, .divide:hover, .add:hover, .subtract:hover{
-background-color: #4A4A4A;
-transition: background 0.2s ease;
 }
 .arrow-up {
 	width:150px;
@@ -393,12 +378,65 @@ transition: background 0.2s ease;
 	width:170px;
 	height:5px;
 	border-bottom: 5px solid black;
-	margin-left:699px;
-	margin-top:57px;
-	margin-bottom:15px;
+	margin-left: 699px;
+	margin-top: 57px;
+	margin-bottom: 15px;
 	-webkit-transform: rotate(18deg);
     -moz-transform: rotate(18deg);
     -o-transform: rotate(18deg);
     -ms-transform: rotate(18deg);
     transform: rotate(18deg);
+}
+.trig{
+	margin: 0 auto;
+	margin-top: 27.5px;
+	border-radius: 20px;
+	width: 460px;
+	height: 80px;
+	background-color: #F8F8F8;
+	border: 5px solid black;
+	font-family: "Lucida Console", Courier, monospace;
+	text-align: center;
+	line-height: 2.3;
+}
+.sin{
+	height: 80px;
+	width: 150px;
+	float: left;
+	font-size: 30px;
+	border-right: 5px solid black;
+	border-top-left-radius: 14px;
+	border-bottom-left-radius: 14px;
+}
+.cos{
+	height: 80px;
+	width: 150px;
+	float: left;
+	font-size: 30px;
+	border-right: 5px solid black;
+}
+.tan{
+	height: 80px;
+	width: 150px;
+	float: left;
+	font-size: 30px;
+	border-top-right-radius: 14px;
+	border-bottom-right-radius: 14px;
+
+
+}
+.switch:hover, .seven:hover, .eight:hover, .nine:hover, 
+.four:hover, .five:hover, .six:hover, 
+.one:hover, .two:hover, .three:hover, 
+.zero:hover, .point:hover, .clear:hover, 
+.l-paren:hover, .r-paren:hover, .submit:hover, 
+.pi-num:hover, .e-num:hover, .exponential:hover, 
+.sqrt:hover, .log:hover, .deriv:hover, .x-var:hover, 
+.sin:hover, .cos:hover, .tan:hover{
+background-color: #BFBFBF;
+transition: background 0.2s ease;
+}
+.multiply:hover, .divide:hover, .add:hover, .subtract:hover{
+background-color: #4A4A4A;
+transition: background 0.2s ease;
 }
